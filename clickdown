@@ -3,7 +3,7 @@ set -eou pipefail
 
 print_help () {
 cat << EOF
-usage: clickdown [-h | --help]
+usage: clickdown [-h | --help] [-v | --version]
 
 subcommands
   init           Initializes the clickdown repo
@@ -94,6 +94,10 @@ if [ $# -lt 1 ]; then
   print_help
 else
   case $1 in
+    -v|--version)
+      echo "1.0.0"
+      ;;
+
     init)
       git init -q
       mkdir tickets

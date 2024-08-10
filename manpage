@@ -1,0 +1,83 @@
+.\" Manpage for clickdown.
+.\" Contact https://github.com/hissssst to correct errors or typos.
+.TH clickdown 1 "10 August 2024" "1.0" "User Commands"
+.SH NAME
+clickdown \- command line issue tracker
+.SH DESCRIPTION
+clickdown is a powerful command-line tool and issue tracker designed to be simple and efficient
+.SH SYNOPSIS
+clickdown [-h | --help] [-v | --version] [COMMAND]
+.SH COMMANDS
+.B init
+Initializes the clickdown repo
+.PP
+.B new
+Creates a new ticket
+.PP
+.B edit
+Edits a ticket with your favorite editor
+.PP
+.B edit-template
+Edits a ticket template
+.SH SUGGESTED FLOW
+If you're coming from traditional extremely overloaded project management software
+(like Jira or Clickup), it might be a little confusing how everything related to
+ticket management was already there. Please refer to the following recepies.
+
+.B Create a project
+.PP
+Create a new empty directory, enter it and run \fIclickdown init\fR.
+It will create Git repository, ticket template file and this README.
+Then you'll need to configure git by editing \fI.git/config\fR to put
+the project files on some git hosting (like Github, Gitlab or sr.ht).
+
+.B Use existing project
+.PP
+Just use \fIgit clone\fR with a URL of the project you want to use
+
+.B Create a ticket
+.PP
+Just run a \fIclickdown new Ticket\fR and it will create an empty ticket with
+a name Ticket and some ither fields. Each field is populated by a simple shell command.
+
+.B Edit a ticket
+.PP
+Just call \fIclickdown edit Ticket\fR and it will edit a ticket and push
+it with relevant commit message
+
+.B Edit a ticket template
+.PP
+Ticket template is just a shell template which allows regular shell commands
+to be executed inside of the \fI\$()\fR. To edit it, call \fIclickdown edit-template\fR
+
+.B Create a sprint or workflow or ticket group.
+.PP
+Simply create a directory like \fImkdir Sprint-1\fR. To put some tickets there, use symbolic links,
+like \fIln -s ticket/Learn_Clickdown.txt Sprint-1\fR. To document what this sprint is about, just
+put a file called \fIREADME.md\fR in the directory.
+
+Don't forget to commit and push the change with \fIgit add . && git commit -m "Added Sprint-1" && git push\fR
+
+.B Search tickets
+.PP
+To search by any field, use a powerful utility called \fIgrep\fR. For example, to search by author use
+\`grep "Author: Jhon Doe" tickets/*\`. To search tickets by status (if you have this field), use
+\`grep "Status: OPEN" tickets/*\`. To search in specific sprint or workflow or ticket group, use
+\`grep "Author: Jhon Doe" Sprint-1/*\`
+
+.B View history
+.PP
+For history and synchronization, clickdown uses powerful \fIgit\fR utility. To view history of changes
+for specific ticket, use \fIgit blame tickets/Ticket.txt\fR. To view history of all changes
+in the project, use \fIgit log\fR
+
+.B Web user interface
+.PP
+Sometimes you don't have access to CLI. In this case, feel free to use powerful and extremely
+efficient interfaces or your Git hosting
+.SH SEE ALSO
+grep(1), git(1), bash(1)
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Hissssst (https://github.com/hissssst)
