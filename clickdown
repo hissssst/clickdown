@@ -107,7 +107,7 @@ else
         echo "Must provide a name for a ticket. For example \`clickdown new \"The problem\"\`" >&2
       else
         TITLE="$2"
-        eval "cat <<< \"$(<.template)\"" 2> /dev/null > "tickets/${TITLE}.txt"
+        eval "cat <<< \"$(cat .template)\"" 2> /dev/null > "tickets/${TITLE}.txt"
         echo "Created $TITLE"
       fi
       ;;
