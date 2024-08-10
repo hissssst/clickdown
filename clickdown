@@ -1,0 +1,139 @@
+#!/bin/sh
+set -eou pipefail
+
+print_help () {
+cat << EOF
+usage: clickdown [-h | --help]
+
+subcommands
+  init           Initializes the clickdown repo
+  new            Creates a new ticket
+  edit           Edits a ticket with your favorite editor
+  edit-template  Edits a ticket template
+EOF
+}
+
+write_template() {
+cat << EOF > .template
+Title: \$TITLE
+Author: \$(git config user.name) \$(git config user.email)
+Created at: \$(date)
+
+# Description goes here
+EOF
+}
+
+write_readme() {
+cat << EOF > README.md
+# Clickdown ticket repository
+
+Clickdown is a simple CLI tool for ticket system management, designed to be
+follow UNIX philosophy and be simple, efficient and portable across UNIX-like systems
+
+## Suggested flow
+
+If you're coming from traditional extremely overloaded project management software
+(like Jira or Clickup), it might be a little confusing how everything related to
+ticket management was already there. Please refer to the following recepies.
+
+### Create a project
+
+Create a new empty directory, enter it and run \`clickdown init\`.
+It will create Git repository, ticket template file and this README.
+Then you'll need to configure git by editing \`.git/config\` to put
+the project files on some git hosting (like Github, Gitlab or sr.ht).
+
+### Use existing project
+
+Just use \`git clone\` with a URL of the project you want to use
+
+### Create a ticket
+
+Just run a \`clickdown new Ticket\` and it will create an empty ticket with
+a name Ticket and some ither fields. Each field is populated by a simple shell command.
+
+### Edit a ticket
+
+Just call \`clickdown edit Ticket\` and it will edit a ticket and push
+it with relevant commit message
+
+### Edit a ticket template
+
+Ticket template is just a shell template which allows regular shell commands
+to be executed inside of the \`\$()\`. To edit it, call \`clickdown edit-template\`
+
+### Create a sprint or workflow or ticket group.
+
+Simply create a directory like \`mkdir Sprint-1\`. To put some tickets there, use symbolic links,
+like \`ln -s ticket/Learn_Clickdown.txt Sprint-1\`. To document what this sprint is about, just
+put a file called \`README.md\` in the directory.
+
+> Don't forget to commit and push the change with \`git add . && git commit -m "Added Sprint-1" && git push\`
+
+### Search tickets
+
+To search by any field, use a powerful utility called \`grep\`. For example, to search by author use
+\`grep "Author: Jhon Doe" tickets/*\`. To search tickets by status (if you have this field), use
+\`grep "Status: OPEN" tickets/*\`. To search in specific sprint or workflow or ticket group, use
+\`grep "Author: Jhon Doe" Sprint-1/*\`
+
+### View history
+
+For history and synchronization, clickdown uses powerful \`git\` utility. To view history of changes
+for specific ticket, use \`git blame tickets/Ticket.txt\`. To view history of all changes
+in the project, use \`git log\`
+
+### Web user interface
+
+Sometimes you don't have access to CLI. In this case, feel free to use powerful and extremely
+efficient interfaces or your Git hosting
+EOF
+}
+
+if [ $# -lt 1 ]; then
+  print_help
+else
+  case $1 in
+    init)
+      git init -q
+      mkdir tickets
+      write_readme
+      write_template
+      echo "Initialized clickdown repository"
+      ;;
+
+    new)
+      if [ $# -lt 2 ]; then
+        echo "Must provide a name for a ticket. For example \`clickdown new \"The problem\"\`" >&2
+      else
+        TITLE="$2"
+        eval "cat <<< \"$(<.template)\"" 2> /dev/null > "tickets/${TITLE}.txt"
+        echo "Created $TITLE"
+      fi
+      ;;
+
+    edit)
+      if [ $# -lt 2 ]; then
+        echo "Must provide a name for a ticket to be editer. For example \`clickdown edit \"The problem\"\`" >&2
+      else
+        TITLE="$2"
+        git pull -q
+        $EDITOR "tickets/${TITLE}.txt"
+        git commit -q -m "Edited $TITLE"
+        git push -q
+        echo "Edited $TITLE"
+      fi
+      ;;
+
+    edit-template)
+      git pull -q
+      $EDITOR .template
+      git commit -q -m "Edited $TITLE"
+      git push -q
+      ;;
+
+    --help|-h|*)
+      print_help
+      ;;
+  esac
+fi
